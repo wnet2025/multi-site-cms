@@ -1,0 +1,153 @@
+erDiagram
+    websites ||--o{ domains : owns
+    websites ||--o{ pages : owns
+    websites ||--o{ media : owns
+    websites ||--o{ navigation_menus : owns
+    websites ||--o{ navigation_items : owns
+    websites ||--o{ website_template_settings : configures
+    websites ||--o{ website_settings : has
+    templates ||--o{ website_template_settings : configured_for
+    templates ||--o{ websites : active_template
+    pages ||--o{ sections : contains
+    navigation_menus ||--o{ navigation_items : contains
+    pages ||--o{ navigation_items : linked_by
+    navigation_items ||--o{ navigation_items : parent_of
+
+    websites {
+      BIGINT id PK
+      VARCHAR name
+      VARCHAR slug
+      TEXT description
+      ENUM status
+      VARCHAR default_locale
+      ENUM text_direction
+      VARCHAR timezone
+      VARCHAR template_id FK
+      VARCHAR template_version
+      DATETIME created_at
+      DATETIME updated_at
+      DATETIME deleted_at
+    }
+    domains {
+      BIGINT id PK
+      BIGINT website_id FK
+      VARCHAR domain UK
+      BOOLEAN is_primary
+      BIGINT primary_website_id UK "generated"
+      DATETIME created_at
+      DATETIME updated_at
+      UK website_id_id
+    }
+    templates {
+      BIGINT id PK
+      VARCHAR template_id UK
+      VARCHAR name
+      VARCHAR version
+      VARCHAR directory
+      TEXT description
+      ENUM status
+      DATETIME created_at
+      DATETIME updated_at
+    }
+    website_template_settings {
+      BIGINT id PK
+      BIGINT website_id FK
+      VARCHAR template_id FK
+      VARCHAR template_version
+      JSON settings
+      DATETIME created_at
+      DATETIME updated_at
+      DATETIME deleted_at
+      VARCHAR active_template_id UK "generated"
+    }
+    pages {
+      BIGINT id PK
+      BIGINT website_id FK
+      VARCHAR title
+      VARCHAR slug
+      ENUM status
+      VARCHAR seo_title
+      VARCHAR seo_description
+      DATETIME published_at
+      DATETIME created_at
+      DATETIME updated_at
+      DATETIME deleted_at
+      UK website_id_slug
+      UK website_id_id
+    }
+    sections {
+      BIGINT id PK
+      BIGINT website_id FK
+      BIGINT page_id FK
+      VARCHAR section_key
+      VARCHAR section_type
+      INT display_order
+      ENUM visibility
+      JSON content
+      JSON configuration
+      DATETIME created_at
+      DATETIME updated_at
+      DATETIME deleted_at
+      UK website_id_id
+    }
+    media {
+      BIGINT id PK
+      BIGINT website_id FK
+      VARCHAR original_filename
+      VARCHAR stored_filename
+      VARCHAR storage_key
+      VARCHAR mime_type
+      VARCHAR extension
+      BIGINT file_size
+      INT width
+      INT height
+      VARCHAR alt_text
+      DATETIME created_at
+      DATETIME deleted_at
+      UK website_id_id
+    }
+    navigation_menus {
+      BIGINT id PK
+      BIGINT website_id FK
+      VARCHAR name
+      VARCHAR menu_key
+      VARCHAR location
+      ENUM status
+      DATETIME created_at
+      DATETIME updated_at
+      UK website_id_menu_key
+      UK website_id_id
+    }
+    navigation_items {
+      BIGINT id PK
+      BIGINT website_id FK
+      BIGINT menu_id FK
+      BIGINT parent_id FK
+      VARCHAR title
+      ENUM link_type
+      BIGINT page_id FK
+      VARCHAR external_url
+      INT display_order
+      ENUM visibility
+      ENUM target
+      DATETIME created_at
+      DATETIME updated_at
+      UK website_id_id
+    }
+    website_settings {
+      BIGINT id PK
+      BIGINT website_id FK
+      VARCHAR setting_key
+      JSON setting_value
+      DATETIME created_at
+      DATETIME updated_at
+      UK website_id_setting_key
+    }
+    schema_migrations {
+      BIGINT id PK
+      VARCHAR migration_name UK
+      BIGINT version UK
+      CHAR checksum
+      DATETIME executed_at
+    }
+

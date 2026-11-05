@@ -1,0 +1,4 @@
+<?php
+declare(strict_types=1);
+return ['name'=>'202611040007_create_media','version'=>202611040007,'checksum'=>'7777777777777777777777777777777777777777777777777777777777777777','up'=>static function(PDO $pdo): void {$pdo->exec("CREATE TABLE media (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,website_id BIGINT UNSIGNED NOT NULL,original_filename VARCHAR(255) NOT NULL,stored_filename VARCHAR(255) NOT NULL,storage_key VARCHAR(500) NOT NULL,mime_type VARCHAR(100) NOT NULL,extension VARCHAR(20) NOT NULL,file_size BIGINT UNSIGNED NOT NULL,width INT UNSIGNED NULL,height INT UNSIGNED NULL,alt_text VARCHAR(255) NULL,created_at DATETIME(6) NOT NULL,deleted_at DATETIME(6) NULL,PRIMARY KEY(id),UNIQUE KEY uq_media_website_id_id(website_id,id),KEY ix_media_website_created(website_id,created_at),CONSTRAINT fk_media_website FOREIGN KEY(website_id) REFERENCES websites(id) ON UPDATE CASCADE ON DELETE RESTRICT) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci");}];
+

@@ -1,0 +1,38 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require dirname(__DIR__) . '/src/Database/Connection.php';
+require dirname(__DIR__) . '/src/Database/MigrationRunner.php';
+
+use MultiSiteCms\Database\Connection;
+use MultiSiteCms\Database\MigrationRunner;
+
+$command = $argv[1] ?? '';
+if (!in_array($command, ['db:migrate', 'db:migrate:status', 'db:seed'], true)) {
+    fwrite(STDERR, "Usage: php bin/console db:migrate|db:migrate:status|db:seed\n");
+    exit(2);
+}
+
+try {
+    $pdo = Connection::fromEnvironment();
+    $runner = new MigrationRunner($pdo, dirname(__DIR__) . '/database/migrations');
+    if ($command === 'db:migrate') {
+        printf("Applied migrations: %d\n", $runner->migrate());
+        exit(0);
+    }
+    if ($command === 'db:migrate:status') {
+        $executed = $runner->executed();
+        foreach ($runner->discover() as $migration) {
+            printf("%s %s\n", isset($executed[$migration['name']]) ? 'executed' : 'pending', $migration['name']);
+        }
+        exit(0);
+    }
+    require dirname(__DIR__) . '/database/seeders/TemplateSeeder.php';
+    printf("Seeded templates: %d\n", (new TemplateSeeder($pdo, dirname(__DIR__) . '/templates'))->run());
+} catch (Throwable $exception) {
+    fwrite(STDERR, $exception->getMessage() . "\n");
+    exit(1);
+}
+
